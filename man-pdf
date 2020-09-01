@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+# purpose: show manuals in pdf format. props to Luke Smith (yt)
+#
+# deps:
+#   - dmenu
+#   - zathura
+
+man -k . | dmenu -l 15 -nb "#282a36" -nf "#fff" -sb "#50fa7b" -sf "#282a36" -fn "IBM Plex Mono" -p "exec:" | awk '{print $1}' | xargs man -Tpdf | zathura -
+
+# Explanation:
+# man -k .    list all manual pages
+# dmenu       for visually selecting a menual from a list
+# awk         name says it all
+# xargs       == do ==
+# zathura     pdf viewer. capable of reading pdf data from stdout
