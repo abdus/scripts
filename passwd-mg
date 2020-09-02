@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# this script is for managing my passwords. basically it decrypt and reads
+# passwords from a gpg-encrypted files and copy passwords into system clipboard.
+# if it can't find a password or there are multiple passwords for a system,
+# script will show an appropriate notification.
+
+# deps:
+#   - gpg
+#   - mako and notify-send
+#   - wl-clipboard
+
+# encrypted file location: ~/.passwords.gpg
+
+# plaintext password file format:
+# domain        username          password
+# google.com    mail@google.com   sdnfn3o344%*
+
+set -e
+
+GPG_KEYID="0xEB3966E37BA3DFD8"
+
+if [[ ! -f ~/.passwords.gpg ]]; then
+  printf '' | gpg -r "$GPG_KEYID" --armor --encrypt
+fi
+
+function get_pass() {
+  if [[ -z "$1" ]]; then
+    notify-send "I don't know what to search for" -i tux
+  fi
+
+  passwords="$(gpg --decrypt ~/.passwords.gpg 2>/dev/null |
+    grep --regexp="$1" |
+    awk '{print $2 "     " $3}')"
+
+  number_of_passwds=$(printf '%s\n' "$passwords" | wc -l)
+
+  if [[ "$number_of_passwds" -le "0" ]]; then
+    notify-send "No password found" -i tux
+  elif [[ "$number_of_passwds" -eq "1" ]]; then
+    printf '%s\n' "$passwords" | awk '{print $2}' | wl-copy
+    notify-send "Password copied to clipboard" -i tux
+  else
+    notify-send \
+      "$number_of_passwds passwords copied to clipboard. Make sure to check before use" \
+      -i tux
+
+    echo "$passwords" | wl-copy
+  fi
+}
+
+# add a new password to encrypted file
+# steps: get password from user, decrypt file, append new password to file, encrypt, write back
+
+function add_pass() {
+  if [[ -z $1 ]]; then
+    notify-send "You forgot to provide domain name" -i tux
+  elif [[ -z $2 ]]; then
+    notify-send "You forgot to provide username" -i tux
+  elif [[ -z "$3" ]]; then
+    notify-send "You forgot to provide password" -i tux
+  fi
+
+  gpg_stuff=$(gpg --decrypt ~/.passwords.gpg 2>/dev/null)
+
+  printf '%s\n' "$gpg_stuff" |
+    sed -e "\$a\\$(printf '%-34s' $1)$(printf '%-34s' $2)$3" |
+    gpg -r "$GPG_KEYID" --armor --output ~/.passwords.gpg --encrypt 2>/dev/null |
+    gpg --decrypt 2>/dev/null |
+    >file.gpg
+
+  notify-send "Saved New Password." -i tux
+}
+
+# list pass
+function list_entries() {
+  selected_entry=$(gpg --decrypt ~/.passwords.gpg 2>/dev/null |
+    awk '{$1=sprintf("%-34s", $1);$3=""}1' |
+    dmenu -l 10 \
+      -nb "#282a36" -nf "#fff" \
+      -sb "#50fa7b" -sf "#282a36" \
+      -fn "IBM Plex Mono" -p "exec:")
+
+  printf '%s\n' "$selected_entry"
+  wl-copy "$selected_entry"
+
+  notify-send "Entry copied to clipboard. Use it to search for password" -i tux
+}
+
+# handler
+if [[ "$1" == "get" ]]; then
+  get_pass $2
+elif [[ "$1" == "add" ]]; then
+  add_pass $2 $3 $4
+elif [[ "$1" == "list" ]]; then
+  list_entries
+fi
