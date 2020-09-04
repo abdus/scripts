@@ -16,9 +16,30 @@
 # domain        username          password
 # google.com    mail@google.com   sdnfn3o344%*
 
+
+
+#         USAGE
+# +++++++++++++++++++++
+# list all available entries: passwd-mg list
+# get a password            : passwd-mg get REGEX
+# add a new entry to file   : passwd-mg add DOMAIN EMAIL PASSWORD
+# remove entries            : passwd-mg rm REGEX
+
+# regex is the thing this password manager heavily depends on. so, in-case
+# you don't know regex, please loog it up on google/duckduckgo
+
 set -e
 
 GPG_KEYID="0xEB3966E37BA3DFD8"
+
+# check if gpg key for `KEYID` exists
+gpg --list-keys "$GPG_KEYID" >/dev/null 2>&1
+
+# `$?` stores the exit code of last command 
+if [[ $? != "0" ]]; then
+  echo "Key for $GPG_KEYID could not be found"
+  exit 2
+fi
 
 if [[ ! -f ~/.passwords.gpg ]]; then
   printf '' | gpg -r "$GPG_KEYID" --armor --encrypt
@@ -74,17 +95,41 @@ function add_pass() {
 
 # list pass
 function list_entries() {
-  selected_entry=$(gpg --decrypt ~/.passwords.gpg 2>/dev/null |
-    awk '{$1=sprintf("%-34s", $1);$3=""}1' |
-    dmenu -l 10 \
-      -nb "#282a36" -nf "#fff" \
-      -sb "#50fa7b" -sf "#282a36" \
-      -fn "IBM Plex Mono" -p "exec:")
+  selected_entry=$(
+    gpg --decrypt ~/.passwords.gpg 2>/dev/null |
+      awk '{$1=sprintf("%-34s", $1);$3=""}1'
+  )
 
   printf '%s\n' "$selected_entry"
-  wl-copy "$selected_entry"
+}
 
-  notify-send "Entry copied to clipboard. Use it to search for password" -i tux
+# delete an entry based on regex
+function delete_entry() {
+  REGEX="$1"
+
+  printf "
+---------------------------------
+Following entries will be removed
+---------------------------------
+"
+
+  gpg --decrypt ~/.passwords.gpg 2>/dev/null |
+    grep --regexp="$REGEX" |
+    awk '{print $1 "  " $2}'
+
+  printf '%s\n' "---------------------------------"
+  read -p "Do you want to delete? (yes/[no]): " should_delete
+  printf '%s\n' "---------------------------------"
+
+  if [[ "$should_delete" == "yes" ]]; then
+    gpg --decrypt ~/.passwords.gpg 2>/dev/null |
+      sed "/$REGEX/d" |
+      gpg -r "$GPG_KEYID" --armor --output ~/.passwords.gpg --encrypt 2>/dev/null
+    echo "Entries deleted Successfully!"
+  else
+    echo -e "Entries WON'T be deleted!"
+  fi
+  printf '%s\n' "---------------------------------"
 }
 
 # handler
@@ -94,4 +139,6 @@ elif [[ "$1" == "add" ]]; then
   add_pass $2 $3 $4
 elif [[ "$1" == "list" ]]; then
   list_entries
+elif [[ "$1" == "rm" ]]; then
+  delete_entry $2
 fi
