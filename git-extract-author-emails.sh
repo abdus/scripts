@@ -1,6 +1,12 @@
 #!/bin/bash
 
-git --no-pager log |
-  awk '/^Author.*</ {print $4}' |
-  grep -o --regexp='[^<].*[^>]' |
-  sed -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P'
+if [[ ! -d ".git" ]]; then
+  echo "Not a Git Directory"
+fi
+
+git --no-pager log "$1" |
+  grep --regexp='^Author:\ *' |
+  grep -o --regexp='<.*>' |
+  sed 's/[<|>]//g' |
+  sort -u |
+  uniq -u

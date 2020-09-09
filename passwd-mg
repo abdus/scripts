@@ -16,8 +16,6 @@
 # domain        username          password
 # google.com    mail@google.com   sdnfn3o344%*
 
-
-
 #         USAGE
 # +++++++++++++++++++++
 # list all available entries: passwd-mg list
@@ -35,7 +33,7 @@ GPG_KEYID="0xEB3966E37BA3DFD8"
 # check if gpg key for `KEYID` exists
 gpg --list-keys "$GPG_KEYID" >/dev/null 2>&1
 
-# `$?` stores the exit code of last command 
+# `$?` stores the exit code of last command
 if [[ $? != "0" ]]; then
   echo "Key for $GPG_KEYID could not be found"
   exit 2
@@ -132,6 +130,19 @@ Following entries will be removed
   printf '%s\n' "---------------------------------"
 }
 
+# Generate passwords
+function gen_pass() {
+  chars='@#$%&_+='
+  {
+    LC_ALL=C grep </dev/urandom -ao '[A-Za-z0-9]' |
+      head -n$((RANDOM % 8 + 9))
+    echo ${chars:$((RANDOM % ${#chars}))} # Random special char.
+  } |
+    shuf |
+    tr -d '\n'
+  echo
+}
+
 # handler
 if [[ "$1" == "get" ]]; then
   get_pass $2
@@ -141,4 +152,6 @@ elif [[ "$1" == "list" ]]; then
   list_entries
 elif [[ "$1" == "rm" ]]; then
   delete_entry $2
+elif [[ "$1" == "gen" ]]; then
+  gen_pass
 fi
