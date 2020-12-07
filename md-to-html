@@ -1,0 +1,45 @@
+#!/bin/bash
+
+FILE=$1
+
+if [[ ! -f $FILE ]]; then
+  echo "'$FILE' does not exists"
+  exit 1
+fi
+
+FILENAME_HTML=$(basename -s .md "$FILE").html
+PANDOC_OUTPUT="
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>...</title>
+    <link
+      rel='stylesheet'
+      href='https://cdnjs.cloudflare.com/ajax/libs/marx/3.0.7/marx.min.css'
+      integrity='sha512-gIfBOM+mjygWMgT6b/dqLds7xc9UxAoN+04jxTdg7oLrqJC8dGdbgGU4ddwPDxOeluhkm+0fsIpFLKwrRBxmGQ=='
+      crossorigin='anonymous'
+    />
+    <link rel='preconnect' href='https://fonts.gstatic.com' />
+    <link
+      href='https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;700&display=swap'
+      rel='stylesheet'
+    />
+
+    <style>
+      html,
+      body {
+        font-family: 'IBM Plex Serif', serif;
+        max-width: 60rem;
+        padding: 1rem;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+  $(pandoc -f markdown -t html "$FILE")
+  </body>
+</html>
+"
+
+echo -e "$PANDOC_OUTPUT" >"$FILENAME_HTML"

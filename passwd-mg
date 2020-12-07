@@ -85,8 +85,6 @@ function add_pass() {
   printf '%s\n' "$gpg_stuff" |
     sed -e "\$a\\$(printf '%-34s' $1)$(printf '%-34s' $2)$3" |
     gpg -r "$GPG_KEYID" --armor --output ~/.passwords.gpg --encrypt 2>/dev/null |
-    gpg --decrypt 2>/dev/null |
-    >file.gpg
 
   notify-send "Saved New Password." -i tux
 }
