@@ -36,12 +36,17 @@ function removeFiles() {
   }
 }
 
+function deleteReadme() {
+  fs.unlinkSync("README.md");
+}
+
 try {
   cleanUpAppJS("import logo from './logo.svg';", "");
   cleanUpAppJS(/\<div ([\S \s]+) <\/div>/i, "<div className='App'> </div>");
   cleanIndexJS();
   createComponentDir();
   removeFiles();
+  deleteReadme();
 } catch (ex) {
   console.log(ex.stack);
 }

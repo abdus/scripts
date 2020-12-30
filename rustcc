@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# just a wrapper around rustc. having an uniform output 
+# name would make it easier to gitignore binaries
+
+if [ -z $1 ]; then
+    echo "Don't know what to compile" && exit 1;
+else
+    line="$1"
+    file="${line##*/}"
+    output="${file%.*}"
+
+    rustc $file -o "$output.bin" 
+fi
