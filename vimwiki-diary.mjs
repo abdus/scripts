@@ -5,6 +5,8 @@ import path from "path";
 import os from "os";
 import { execSync } from "child_process";
 
+console.log(process.env.SRC, process.env.OUT);
+
 const SRC = process.env.SRC || path.resolve(os.homedir(), "vimwiki/diary");
 const OUT = process.env.OUT || path.resolve(os.tmpdir(), "diary-build");
 
@@ -45,6 +47,12 @@ const template = `
       padding: 1rem;
       margin: auto;
     }
+
+    code {
+      background-color: #5465ff18;
+      padding: 0 4px;
+      border-radius: 0.3rem;
+    }
   </style>
 </head>
 <body>
@@ -69,15 +77,21 @@ const months = [
 ];
 
 for (let i in diaryEntries.reverse()) {
-  if (diaryEntries[i] !== "diary.md") {
+  if (diaryEntries[i] !== "diary.md" && diaryEntries[i] !== ".git") {
     const date = betterDate(new Date(diaryEntries[i].replace(/.md$/i, "")));
     const file = path.resolve(SRC, diaryEntries[i]);
-    const html = execSync(`showdown makehtml -i "${file}"`).toString(
-      "utf-8"
-    );
+
+    const html = execSync(`showdown makehtml -i "${file}"`).toString("utf-8");
     finalHTML += `<article>
-        <h4>${date.toUpperCase()}</h4>
-        <hr />
+        <strong
+          id="${date.toLowerCase()}"
+          style="background: yellow; padding: 0.1rem 0.3rem"
+        >
+          <a style="color: inherit" href="#${date.toLowerCase()}">
+            ${date.toUpperCase()}
+          </a>
+        </strong>
+        <div style="margin-bottom: 1rem"></div>
         ${html}
       </article>
       <div style="margin-bottom: 7rem"></div>
