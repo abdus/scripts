@@ -26,6 +26,18 @@
 # regex is the thing this password manager heavily depends on. so, in-case
 # you don't know regex, please loog it up on google/duckduckgo
 
+
+
+
+
+# RIVISION HISTORY
+# 
+# --> ee5ec2c new scripts
+# --> 0c3117d add new scripts
+# --> b8afe77 passwd-mg add 'rm' functionality
+# --> 7c609db :fire: password-manager
+
+
 set -e
 
 GPG_KEYID="0xEB3966E37BA3DFD8"

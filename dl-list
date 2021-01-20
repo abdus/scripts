@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# dl-list
+# © Abdus <abdus@abdus.net>
+#
+# a simple script to download content from a link. a list of links can be
+# provided as first argument
+#
+# how it works:
+#    1. read file and parse URLs. each line should contain exactly one URL
+#    2. when the content of the URI is downloaded, delete that URL from file
+#    3. exit immediately on errors
+#
+# deps:
+#   - gnu core-utils
+#   - cURL
+
+set -e
+
+if [[ ! -f $1 ]]; then
+  echo "File $1 does not exists"
+  exit 1
+fi
+
+while read url; do
+  if ! $url; then
+    curl -O "$url"
+    sed -i "s,$url,,g" "$1"
+  fi
+done <$1
