@@ -2,7 +2,8 @@
 
 set -e
 
-# purpose: show manuals in pdf format. props to Luke Smith (yt)
+# purpose: a simple script to read manuals in pdf format. 
+# props to Luke Smith (yt)
 #
 # deps:
 #   - dmenu
