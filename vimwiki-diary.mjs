@@ -33,7 +33,7 @@ const template = `
   />
   <link rel='preconnect' href='https://fonts.gstatic.com' />
   <link
-    href='https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;700&display=swap'
+    href='https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap'
     rel='stylesheet'
   />
   <meta charset="UTF-8">
@@ -42,16 +42,23 @@ const template = `
   <style>
     html,
     body {
-      font-family: 'IBM Plex Serif', serif;
+      font-family: 'IBM Plex Mono', serif;
       max-width: 60rem;
-      padding: 1rem;
       margin: auto;
+    }
+
+    body {
+      padding: 1rem;
     }
 
     code {
       background-color: #5465ff18;
       padding: 0 4px;
       border-radius: 0.3rem;
+    }
+
+    ol, ul {
+      padding-left: 1rem;
     }
   </style>
 </head>
@@ -61,19 +68,15 @@ const template = `
 </html>
 `;
 let finalHTML = "";
-const months = [
-  "january",
-  "february",
-  "march",
-  "april",
-  "may",
-  "june",
-  "july",
-  "august",
-  "september",
-  "october",
-  "november",
-  "december",
+
+const dayOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
 ];
 
 for (let i in diaryEntries.reverse()) {
@@ -82,19 +85,30 @@ for (let i in diaryEntries.reverse()) {
     const file = path.resolve(SRC, diaryEntries[i]);
 
     const html = execSync(`showdown makehtml -i "${file}"`).toString("utf-8");
-    finalHTML += `<article>
-        <strong
-          id="${date.toLowerCase()}"
-          style="background: yellow; padding: 0.1rem 0.3rem"
+    finalHTML += `
+      <article 
+        style="
+          padding: 1rem; 
+          box-shadow:
+            0 1.2px 17.2px rgba(0, 0, 0, 0.021),
+            0 3.4px 47.5px rgba(0, 0, 0, 0.03),
+            0 8.1px 114.3px rgba(0, 0, 0, 0.039),
+            0 27px 379px rgba(0, 0, 0, 0.06);
+          border-radius: 1rem;
+          background-color: #fff;
+        "
+      >
+        <div
+          id="${date.dateStr}"
+          style="display: inline-block"
         >
-          <a style="color: inherit" href="#${date.toLowerCase()}">
-            ${date.toUpperCase()}
+          <a style="color: inherit" href="#${date.dateStr}">
+            ${date.formatted}
           </a>
-        </strong>
-        <div style="margin-bottom: 1rem"></div>
+        </div>
+
         ${html}
       </article>
-      <div style="margin-bottom: 7rem"></div>
     `;
   }
 }
@@ -106,5 +120,16 @@ fs.writeFileSync(
 );
 
 function betterDate(date) {
-  return `${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`;
+  const day = (date.getDate() + "").padStart(2, 0);
+  const month = (date.getMonth() + 1 + "").padStart(2, 0);
+  const weekDay = dayOfWeek[date.getDay()];
+  //const year = date.getFullYear();
+
+  const formatted = `
+  <p style="color: darkred">
+    <span style="font-size: 1.4em">${day}&middot;${month}</span><br/>
+    <span style="letter-spacing: 4px; font-size: 0.8em">${weekDay.toUpperCase()}</span>
+  </p>`;
+
+  return { dateStr: date.toUTCString(), formatted };
 }
