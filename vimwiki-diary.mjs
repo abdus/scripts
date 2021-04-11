@@ -126,10 +126,10 @@ function betterDate(date) {
   //const year = date.getFullYear();
 
   const formatted = `
-  <p style="color: darkred">
+  <div style="color: darkred; margin-bottom: 0.5rem">
     <span style="font-size: 1.4em">${day}&middot;${month}</span><br/>
     <span style="letter-spacing: 4px; font-size: 0.8em">${weekDay.toUpperCase()}</span>
-  </p>`;
+  </div>`;
 
   return { dateStr: date.toUTCString(), formatted };
 }
