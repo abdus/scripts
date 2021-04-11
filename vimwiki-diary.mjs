@@ -60,6 +60,11 @@ const template = `
     ol, ul {
       padding-left: 1.5rem;
     }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-size: 1.4em;
+      margin-bottom: 0.4rem;
+    }
   </style>
 </head>
 <body>
