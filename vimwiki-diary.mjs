@@ -58,7 +58,7 @@ const template = `
     }
 
     ol, ul {
-      padding-left: 1rem;
+      padding-left: 1.5rem;
     }
   </style>
 </head>
