@@ -33,7 +33,7 @@ const template = `
   />
   <link rel='preconnect' href='https://fonts.gstatic.com' />
   <link
-    href='https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap'
+    href='https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;700&display=swap'
     rel='stylesheet'
   />
   <meta charset="UTF-8">
@@ -42,7 +42,7 @@ const template = `
   <style>
     html,
     body {
-      font-family: 'IBM Plex Mono', serif;
+      font-family: 'IBM Plex Serif', serif;
       max-width: 60rem;
       margin: auto;
     }
