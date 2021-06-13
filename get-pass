@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PASSWORD_FILES="$(ls ~/.password-store | sed -r 's/.gpg//g')"
+SELECTED=$(echo -e "$PASSWORD_FILES" |
+  dmenu -l \
+    15 -nb "#282a36" \
+    -nf "#fff" \
+    -sb "#50fa7b" \
+    -sf "#282a36" \
+    -fn "Iosevka" -p "exec:" |
+  awk '{print $1}')
+
+pass show "$SELECTED" -c
