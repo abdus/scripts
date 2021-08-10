@@ -15,7 +15,7 @@ while [ $SIG != 0 ]; do
   if [[ $SSH_CRED ]]; then
     echo 'syncing files with server...'
     cd ~/Public
-    rsync -avhL --delete ./ -e ssh $SSH_CRED:/var/www/public.abdus.net/html/
+    rsync -avhL --delete ./ -e ssh $SSH_CRED:/home/abdus/Public
   fi
 
 done
